@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen Final - Veterinaria USAM</title>
+    <style>
+        /* CSS: DISEÑO Y ESTILOS VISUALES */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f1f2f6; }
+        .contenedor-principal { display: flex; gap: 25px; margin: 20px; min-height: 85vh; }
+        
+        /* Menú Lateral */
+        .menu-lateral { width: 280px; background-color: #2c3e50; color: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .menu-lateral h3 { text-align: center; color: #3498db; margin-top: 0; font-size: 1.4rem; }
+        .rol-indicador { background-color: #34495e; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; border-left: 4px solid #f1c40f; }
+        
+        /* Botones de Navegación */
+        .opcion-menu { display: block; color: #ecf0f1; padding: 12px; text-decoration: none; margin-bottom: 8px; border-radius: 4px; border: none; background: none; width: 100%; text-align: left; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .opcion-menu:hover { background-color: #34495e; color: #3498db; }
+        .opcion-activa { background-color: #3498db; color: white; font-weight: bold; }
+        
+        /* Área de Trabajo Central */
+        .panel-trabajo { flex-grow: 1; background: white; padding: 35px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #dcdde1; }
+        .pestana-contenido { display: none; }
+        .pestana-contenido.activa { display: block; }
+        
+        /* Formularios y Campos */
+        h2 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: 600; color: #2c3e50; }
+        .campo { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccd1d1; box-sizing: border-box; font-size: 1rem; }
+        .boton { background-color: #3498db; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 20px; }
+        .boton:hover { background-color: #2980b9; }
+        .alertas { padding: 12px; border-radius: 5px; margin-bottom: 15px; display: none; font-weight: bold; }
+
+        /* Estilos de la Hoja de Reporte */
+        .cuadro-reporte { border: 2px solid #2c3e50; padding: 25px; background: white; margin-top: 25px; border-radius: 4px; }
+        .tabla-reporte { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .tabla-reporte th, .tabla-reporte td { border: 1px solid #bdc3c7; padding: 10px; text-align: left; font-size: 0.95rem; }
+        .tabla-reporte th { background-color: #2c3e50; color: white; }
+        
+        /* Botón de eliminar registro */
+        .btn-eliminar { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+        .btn-eliminar:hover { background-color: #c0392b; }
+
+        /* Barra de búsqueda especial */
+        .barra-busqueda { background-color: #ecf0f1; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; }
+        
+        /* Estilos para filas dobles de campos */
+        .fila-campos { display: flex; gap: 15px; }
+        .columna-campo { flex: 1; }
+    </style>
+</head>
+<body>
+
+<div class="contenedor-principal">
+    
+    <div class="menu-lateral">
+        <h3>Veterinaria USAM</h3>
+        
+        <div class="rol-indicador">
+            <strong>🔐 Perfil Actual:</strong><br>
+            <span id="txt-rol">Administrador</span>
+        </div>
+        
+        <nav>
+            <button class="opcion-menu opcion-activa" onclick="cambiarPestana('registro', this)">📋 Proceso 1: Registro</button>
+            <button class="opcion-menu" onclick="cambiarPestana('servicio', this)">🩺 Proceso 2: Servicio</button>
+            <button class="opcion-menu" id="btn-menu-reporte" onclick="cambiarPestana('reportes', this)">📊 Módulo: Reportes</button>
+        </nav>
+
+        <div style="margin-top: 120px; font-size: 0.85rem; text-align: center; color: #bdc3c7; line-height: 1.4;">
+            <p style="margin:0; font-weight:bold; color: #3498db;">Gloria Giselle Villeda Rosales</p>
+            <p style="margin:0;">Carnet: 250126</p>
+        </div>
+    </div>
+
+    <div class="panel-trabajo">
+        
+        <div id="caja-alerta" class="alertas"></div>
+
+        <div id="pestana-registro" class="pestana-contenido activa">
+            <h2>Proceso 1: Registro de Información de Mascota y Dueño</h2>
+            <p style="color: #7f8c8d;">Formulario de captura para agregar nuevos pacientes y clientes asociados con sus identificaciones.</p>
+            
+            <form onsubmit="guardarMascotaBBDD(event)">
+                <div class="fila-campos">
+                    <div class="columna-campo">
+                        <label>ID del Cliente / Dueño *</label>
+                        <input type="text" id="txt-id-cliente" class="campo" placeholder="Ej. CLI-101">
+                    </div>
+                    <div class="columna-campo">
+                        <label>ID de la Mascota *</label>
+                        <input type="text" id="txt-id-mascota" class="campo" placeholder="Ej. MAS-502">
+                    </div>
+                </div>
+
+                <label>Nombre Completo del Dueño *</label>
+                <input type="text" id="txt-dueno" class="campo" placeholder="Ej. Juan Pérez">
+
+                <label>Teléfono de Contacto *</label>
+                <input type="text" id="txt-telefono" class="campo" placeholder="Ej. 77889900">
+
+                <label>Nombre de la Mascota *</label>
+                <input type="text" id="txt-mascota" class="campo" placeholder="Ej. Bruno">
+
+                <label>Raza o Especie (Opcional)</label>
+                <input type="text" id="txt-raza" class="campo" placeholder="Ej. Criollo / Canino">
+
+                <button type="submit" class="boton">💾 Guardar Registro Técnico</button>
+            </form>
+        </div>
+
+        <div id="pestana-servicio" class="pestana-contenido">
+            <h2>Proceso 2: Registro del Servicio Solicitado</h2>
+            <p style="color: #7f8c8d;">Asignación de atención inmediata por categoría de servicio clínico.</p>
+            
+            <form onsubmit="guardarServicioBBDD(event)">
+                <label>Seleccionar Ficha de Paciente Registrado</label>
+                <select id="select-mascota" class="campo">
+                    </select>
+
+                <label>Línea de Servicio Solicitado</label>
+                <select id="select-servicio" class="campo">
+                    <option value="Consulta Médica">Consulta Médica</option>
+                    <option value="Servicio de Baño">Servicio de Baño</option>
+                </select>
+
+                <label>Observaciones y Notas de Entrada</label>
+                <textarea id="txt-detalles" class="campo" rows="4" placeholder="Describa síntomas o especificaciones estéticas..."></textarea>
+
+                <button type="submit" class="boton" style="background-color: #2ecc71;">🩺 Confirmar Ingreso de Servicio</button>
+            </form>
+        </div>
+
+        <div id="pestana-reportes" class="pestana-contenido">
+            <h2>Consola General de Reportes Gerenciales</h2>
+            <p style="color: #7f8c8d;">Extracción estructurada del historial operativo. Puedes buscar por Nombre, Perro, ID de Mascota o ID de Cliente.</p>
+            
+            <div class="barra-busqueda">
+                <label style="margin-top: 0; color: #2c3e50;">🔍 Filtro de búsqueda multi-parámetro:</label>
+                <input type="text" id="txt-buscar" class="campo" placeholder="Busca por Perro, Dueño, ID Mascota o ID Cliente..." onkeyup="filtrarReporte()">
+            </div>
+
+            <div id="reporte-resultado" class="cuadro-reporte" style="display: block; margin-top: 20px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #2c3e50; letter-spacing: 0.5px;">REPORTE GENERAL DE SERVICIOS VETERINARIOS</h3>
+                    <span style="font-size: 0.9rem; display: block; margin-top: 5px;"><strong>Filtro de Auditoría Activo por Identificadores</strong></span>
+                    <span style="font-size: 0.9rem; display: block;"><strong>Usuario Supervisor:</strong> Administrador (Acceso Total)</span>
+                </div>
+                
+                <hr style="border: none; border-top: 2px dashed #2c3e50; margin-bottom: 15px;">
+
+                <table class="tabla-reporte">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>ID Cliente</th>
+                            <th>Nombre Dueño</th>
+                            <th>ID Mascota</th>
+                            <th>Nombre Mascota</th>
+                            <th>Servicio</th>
+                            <th>Notas de Atención</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-cuerpo">
+                        </tbody>
+                </table>
+
+                <hr style="border: none; border-top: 2px dashed #2c3e50; margin-top: 25px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #7f8c8d; font-weight: bold;">
+                    <span>Clínica Universidad Masferrer (USAM)</span>
+                    <span>Página 1 de 1</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Inicializar nuestra Base de Datos local con los nuevos campos de ID
+    if (!localStorage.getItem('bbdd_veterinaria')) {
+        let datosIniciales = [
+            { id_interno: 1, fecha: '01/06/2026 09:15', id_cliente: 'CLI-101', dueno: 'Juan Pérez', id_mascota: 'MAS-501', mascota: 'Bruno', servicio: 'Consulta Médica', detalles: 'Chequeo general de vacunas anuales.' },
+            { id_interno: 2, fecha: '01/06/2026 11:30', id_cliente: 'CLI-102', dueno: 'Carlos Mendoza', id_mascota: 'MAS-502', mascota: 'Toby', servicio: 'Servicio de Baño', detalles: 'Corte de pelo y limpieza de oídos.' }
+        ];
+        localStorage.setItem('bbdd_veterinaria', JSON.stringify(datosIniciales));
+    }
+
+    // Cargar componentes al iniciar
+    actualizarSelectorMascotas();
+
+    function cambiarPestana(idPestana, boton) {
+        document.querySelectorAll('.pestana-contenido').forEach(p => p.classList.remove('activa'));
+        document.querySelectorAll('.opcion-menu').forEach(b => b.classList.remove('opcion-activa'));
+        
+        document.getElementById('pestana-' + idPestana).classList.add('activa');
+        boton.classList.add('opcion-activa');
+        document.getElementById('caja-alerta').style.display = 'none';
+        
+        if(idPestana === 'reportes') {
+            document.getElementById('txt-buscar').value = ""; // Limpiar buscador
+            mostrarReporteBBDD(JSON.parse(localStorage.getItem('bbdd_veterinaria')));
+        }
+    }
+
+    // GUARDAR MASCOTA CON SUS IDENTIFICADORES (PROCESO 1)
+    function guardarMascotaBBDD(event) {
+        event.preventDefault();
+        const idCliente = document.getElementById('txt-id-cliente').value.trim();
+        const idMascota = document.getElementById('txt-id-mascota').value.trim();
+        const dueno = document.getElementById('txt-dueno').value.trim();
+        const tel = document.getElementById('txt-telefono').value.trim();
+        const mascota = document.getElementById('txt-mascota').value.trim();
+        const alerta = document.getElementById('caja-alerta');
+
+        // Validamos que los IDs también sean obligatorios
+        if (!idCliente || !idMascota || !dueno || !tel || !mascota) {
+            alerta.style.display = 'block';
+            alerta.style.backgroundColor = '#f8d7da';
+            alerta.style.color = '#721c24';
+            alerta.innerHTML = "❌ Error de Validación: Todos los campos con asterisco (*), incluyendo los IDs, son obligatorios.";
+            return;
+        }
+
+        let baseDatos = JSON.parse(localStorage.getItem('bbdd_veterinaria'));
+        const ahora = new Date();
+        const fechaTxt = `${ahora.getDate().toString().padStart(2,'0')}/06/2026 13:00`;
+
+        let nuevoRegistro = {
+            id_interno: Date.now(),
+            fecha: fechaTxt,
+            id_cliente: idCliente,
+            dueno: dueno,
+            id_mascota: idMascota,
+            mascota: mascota,
+            servicio: 'Registro Inicial',
+            detalles: 'Paciente ingresado al sistema con identificadores asignados.'
+        };
+
+        baseDatos.push(nuevoRegistro);
+        localStorage.setItem('bbdd_veterinaria', JSON.stringify(baseDatos));
+
+        alerta.style.display = 'block';
+        alerta.style.backgroundColor = '#d4edda';
+        alerta.style.color = '#155724';
+        alerta.innerHTML = `✔️ ¡Éxito! La mascota '${mascota}' (ID: ${idMascota}) fue guardada correctamente.`;
+        
+        // Limpiar el formulario
+        document.getElementById('txt-id-cliente').value = '';
+        document.getElementById('txt-id-mascota').value = '';
+        document.getElementById('txt-dueno').value = '';
+        document.getElementById('txt-telefono').value = '';
+        document.getElementById('txt-mascota').value = '';
+        document.getElementById('txt-raza').value = '';
+        actualizarSelectorMascotas();
+    }
+
+    // GUARDAR SERVICIO ENLAZANDO LOS IDs (PROCESO 2)
+    function guardarServicioBBDD(event) {
+        event.preventDefault();
+        const mascotaSelect = document.getElementById('select-mascota');
+        if(!mascotaSelect.value) return;
+
+        const mascotaNombre = mascotaSelect.value;
+        const idMascota = mascotaSelect.options[mascotaSelect.selectedIndex].getAttribute('data-idmascota');
+        const idCliente = mascotaSelect.options[mascotaSelect.selectedIndex].getAttribute('data-idcliente');
+        const duenoNombre = mascotaSelect.options[mascotaSelect.selectedIndex].getAttribute('data-dueno');
+        const servicio = document.getElementById('select-servicio').value;
+        const detalles = document.getElementById('txt-detalles').value || 'Sin observaciones.';
+        const alerta = document.getElementById('caja-alerta');
+
+        let baseDatos = JSON.parse(localStorage.getItem('bbdd_veterinaria'));
+        
+        baseDatos.push({
+            id_interno: Date.now(),
+            fecha: '01/06/2026 13:05',
+            id_cliente: idCliente,
+            dueno: duenoNombre,
+            id_mascota: idMascota,
+            mascota: mascotaNombre,
+            servicio: servicio,
+            detalles: detalles
+        });
+
+        localStorage.setItem('bbdd_veterinaria', JSON.stringify(baseDatos));
+
+        alerta.style.display = 'block';
+        alerta.style.backgroundColor = '#d4edda';
+        alerta.style.color = '#155724';
+        alerta.innerHTML = `✔️ ¡Éxito! Servicio de '${servicio}' registrado correctamente.`;
+        
+        document.getElementById('txt-detalles').value = '';
+    }
+
+    // ACTUALIZAR SELECTOR CON LOS ATRIBUTOS DE ID
+    function actualizarSelectorMascotas() {
+        const select = document.getElementById('select-mascota');
+        if(!select) return;
+        select.innerHTML = "";
+        
+        let baseDatos = JSON.parse(localStorage.getItem('bbdd_veterinaria'));
+        let mapeados = {};
+        
+        baseDatos.forEach(item => {
+            if(!mapeados[item.mascota]) {
+                mapeados[item.mascota] = true;
+                let opt = document.createElement('option');
+                opt.value = item.mascota;
+                opt.setAttribute('data-dueno', item.dueno);
+                opt.setAttribute('data-idcliente', item.id_cliente);
+                opt.setAttribute('data-idmascota', item.id_mascota);
+                opt.innerHTML = `[${item.id_mascota}] ${item.mascota} (Dueño: ${item.dueno})`;
+                select.appendChild(opt);
+            }
+        });
+    }
+
+    // PINTAR LA TABLA DE REPORTES CON LAS NUEVAS COLUMNAS DE ID
+    function mostrarReporteBBDD(datosAFiltrar) {
+        const cuerpo = document.getElementById('tabla-cuerpo');
+        cuerpo.innerHTML = ""; 
+
+        if(datosAFiltrar.length === 0) {
+            cuerpo.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#7f8c8d;">No se encontraron registros coincidentes con ese ID o Nombre.</td></tr>`;
+        } else {
+            datosAFiltrar.forEach(item => {
+                const fila = `<tr>
+                    <td>${item.fecha}</td>
+                    <td style="font-weight:bold; color:#16a085;">${item.id_cliente}</td>
+                    <td>${item.dueno}</td>
+                    <td style="font-weight:bold; color:#2980b9;">${item.id_mascota}</td>
+                    <td>${item.mascota}</td>
+                    <td><span style="background:#cbd5e1; padding:3px 8px; border-radius:4px; font-size:0.85rem; font-weight:bold;">${item.servicio}</span></td>
+                    <td>${item.detalles}</td>
+                    <td><button class="btn-eliminar" onclick="eliminarRegistroBBDD(${item.id_interno})">❌ Eliminar</button></td>
+                </tr>`;
+                cuerpo.innerHTML += fila;
+            });
+        }
+    }
+
+    // BUSCADOR INTELIGENTE: PERMITE BUSCAR POR ID CLIENTE, ID MASCOTA, NOMBRE O PERRO
+    function filtrarReporte() {
+        const textoBusqueda = document.getElementById('txt-buscar').value.toLowerCase();
+        const baseDatos = JSON.parse(localStorage.getItem('bbdd_veterinaria'));
+
+        const datosFiltrados = baseDatos.filter(item => {
+            return item.dueno.toLowerCase().includes(textoBusqueda) || 
+                   item.mascota.toLowerCase().includes(textoBusqueda) ||
+                   item.id_cliente.toLowerCase().includes(textoBusqueda) ||
+                   item.id_mascota.toLowerCase().includes(textoBusqueda);
+        });
+
+        mostrarReporteBBDD(datosFiltrados);
+    }
+
+    // ELIMINAR DATOS
+    function eliminarRegistroBBDD(idRegistro) {
+        if(confirm("¿Deseas eliminar este registro para corregir el error?")) {
+            let baseDatos = JSON.parse(localStorage.getItem('bbdd_veterinaria'));
+            baseDatos = baseDatos.filter(item => item.id_interno !== idRegistro);
+            localStorage.setItem('bbdd_veterinaria', JSON.stringify(baseDatos));
+            
+            filtrarReporte();
+            actualizarSelectorMascotas();
+        }
+    }
+</script>
+
+</body>
+</html>
